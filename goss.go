@@ -64,10 +64,14 @@ func readSubFile(fileName string) {
     var sub SubData
 
     for scanner.Scan() {
-        text := scanner.Text()
+        text := strings.TrimSpace(scanner.Text())
 
+        reBom := regexp.MustCompile(`\x{feff}`)
         reNum := regexp.MustCompile(`^\d+$`)
         reTime := regexp.MustCompile(`^(\d{2}:\d{2}:[\d(,|\.)]+).+(\d{2}:\d{2}:[\d(,|\.)]+)$`)
+
+        // remove any UTF BOM
+        text = reBom.ReplaceAllString(text, "")
 
         switch {
         case reNum.MatchString(text):
@@ -191,11 +195,15 @@ func writeSub() {
     defer file.Close()
 
     for _, sub := range subLines {
-        file.WriteString(sub.Num + "\n")
-
         start := sub.TimeStart.Format("15:04:05.000")
         end := sub.TimeEnd.Format("15:04:05.000")
 
+        if replaceComma {
+            start = strings.Replace(start, ".", ",", 1)
+            end = strings.Replace(end, ".", ",", 1)
+        }
+
+        file.WriteString(sub.Num + "\n")
         file.WriteString(start + " --> " + end + "\n")
         file.WriteString(sub.Text + "\n\n")
     }
