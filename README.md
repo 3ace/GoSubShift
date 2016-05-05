@@ -1,5 +1,5 @@
 # GoSubShift
-Easily delay or advancing time in any .srt subtitle file
+Easily delay or advance time in any .srt subtitle file
 
 ### Use Example
 

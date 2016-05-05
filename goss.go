@@ -27,20 +27,43 @@ var replaceComma    bool
 var subFileName     string
 
 func main() {
-    subFile := flag.String("f", "", "subtitle file")
-    shiftTime := flag.String("t", "", "time shift with format hh:mm:ss.000")
+    log.SetFlags(0)
 
-    replaceComma = false
+    subFile := flag.String("f", "", "subtitle file")
+    shiftTime := flag.String("t", "", "time shift with format hh:mm:ss.000.\n\tAdd '-' (minus) prefix to advance sub")
+
+    flag.Usage = func () {
+        printHelp()
+    }
 
     flag.Parse()
 
-    log.SetFlags(0)
+    if *subFile == "" || *shiftTime == "" {
+        printHelp()
+        return
+    }
 
+    replaceComma = false
     timeReference = setClock(time.Now(), 0, 0, 0, 0)
 
     readSubFile(*subFile)
     shiftSub(*shiftTime)
     writeSub()
+}
+
+func printHelp() {
+    fmt.Println("GoSubShift")
+    fmt.Println("Easily delay or advance time in any .srt subtitle file\n")
+    fmt.Println("Usage:")
+    fmt.Println("\tgoss -f <subtitle file name> -t <shift time>\n")
+    flag.PrintDefaults()
+    fmt.Println("\nUse example:")
+    fmt.Println("\nDelay subtitle for 10 seconds")
+    fmt.Println("\n\t$goss -f subtitle.srt -t 10")
+    fmt.Println("\nDelay subtitle for 1 minutes and 10 seconds")
+    fmt.Println("\n\t$goss -f subtitle.srt -t 1:10")
+    fmt.Println("\nAdvancing subtitle for 1 minutes and 10.5 seconds")
+    fmt.Println("\n\t$goss -f subtitle.srt -t -1:10.5\n")
 }
 
 func readSubFile(fileName string) {
@@ -134,6 +157,8 @@ func shiftSub(shift string) {
     if strings.HasPrefix(shift, "-") {
         trimmedShift = strings.Trim(shift, "- ")
         sign = -1;
+    } else if strings.HasPrefix(shift, "+") {
+        trimmedShift = strings.Trim(shift, "+ ")
     }
 
     for i := 0; i < len(timeFormat); i++ {
