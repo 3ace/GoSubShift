@@ -81,6 +81,8 @@ func readSubFile(fileName string) {
         case reTime.MatchString(text):
             subtime := reTime.FindStringSubmatch(text)
 
+            // had problem with comma in second
+            // replace it with dot Before processing
             if strings.LastIndex(subtime[1], ",") != -1 {
                 subtime[1] = strings.Replace(subtime[1], ",", ".", 1)
                 subtime[2] = strings.Replace(subtime[2], ",", ".", 1)
@@ -114,6 +116,7 @@ func readSubFile(fileName string) {
 }
 
 func shiftSub(shift string) {
+    // try to handle any possible shift time
     timeFormat := []string{
         "5",
         "4:5",
@@ -165,6 +168,8 @@ func shiftSub(shift string) {
         timeStart = sub.TimeStart.Add(shiftDur)
         timeEnd = sub.TimeEnd.Add(shiftDur)
 
+        // when advancing time,
+        // it is possible that the resulting time would be < 0
         if timeStart.Before(timeReference) {
             timeStart = setClock(timeReference, 0, 0, 0, 0)
         }
