@@ -1,6 +1,10 @@
 # GoSubShift
 Easily delay or advance time in any .srt subtitle file
 
+### How To Get It
+
+Get prebuilt binary from [here](https://github.com/3ace/GoSubShift/releases)
+
 ### Use Example
 
 Delay subtitle for 10 seconds
